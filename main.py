@@ -3,6 +3,7 @@ import sys
 import hashlib
 import binary2strings as b2s
 import re
+import json
 
 def info():
     global Fname, sz, tp
@@ -12,8 +13,7 @@ def info():
         tp = os.path.splitext(Fname)[1]
     else:
         print("WHERE DA FILE AT")
-        exit
-
+        exit()
 
 def calculate_hash(file_path, algorithm='sha256'):
     hash_func = hashlib.md5() if algorithm == 'md5' else hashlib.sha256()
@@ -48,6 +48,7 @@ def extract_strings():
                     found_iocs.add(match)
 
 def susapi():
+    global found_apis, found_keywords, found_urls
     suspicious_apis = [
         "CreateRemoteThread",
         "WriteProcessMemory",
@@ -94,8 +95,32 @@ def susapi():
                 if match not in found_urls:
                     found_urls.add(match)
 
-    return found_apis, found_keywords, found_urls
-    
+import os
+import json
+
+def export_report_json():
+    global found_apis, found_keywords, found_iocs, Fname
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # folder of main.py
+    REPORT_FOLDER = os.path.join(BASE_DIR, "reports")
+    os.makedirs(REPORT_FOLDER, exist_ok=True)
+
+    i = 1
+    while os.path.exists(os.path.join(REPORT_FOLDER, f"report{i}.json")):
+        i += 1
+    output_file = os.path.join(REPORT_FOLDER, f"report{i}.json")
+
+    report = {
+        "file": Fname,
+        "apis": list(found_apis),
+        "commands": list(found_keywords),
+        "iocs": list(found_iocs)
+    }
+
+    with open(output_file, "w") as f:
+        json.dump(report, f, indent=4)
+
+    print(f"[+] Report exported to {output_file}")
 
 def main():
     print("Some Fuckass Static Analysis Tool\n")
@@ -120,23 +145,15 @@ def main():
 
     print("Suspicious Imports/API Calls")
     print("~~~~~~~~~~")
-
-    found_apis, found_keywords, found_urls = susapi()
-
     for api in found_apis:
         print(f"[API] {api}")
-
     for kw in found_keywords:
         print(f"[CMD] {kw}")
-
     for ioc in found_urls:
         print(f"[IOC] {ioc}")
-
     print("\n")
 
-
-
-
+    export_report_json()
 
 info()
 calculate_hash(Fname)
