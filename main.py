@@ -95,9 +95,6 @@ def susapi():
                 if match not in found_urls:
                     found_urls.add(match)
 
-import os
-import json
-
 def export_report_json():
     global found_apis, found_keywords, found_iocs, Fname
 
