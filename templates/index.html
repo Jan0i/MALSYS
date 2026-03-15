@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Malware Report Dashboard</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1e1e1e;
+            color: #f0f0f0;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #ff6f61;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        li {
+            margin: 3px 0;
+        }
+        .api { color: #4fc1ff; }
+        .cmd { color: #ffcb6b; }
+        .ioc { color: #ff5370; }
+    </style>
+</head>
+<body>
+    <h1>Latest Malware Report</h1>
+
+    <div class="section">
+        <h2>File Information</h2>
+        <ul>
+            <li><strong>File:</strong> {{ report.file }}</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Suspicious API Calls</h2>
+        <ul>
+            {% for api in report.apis %}
+                <li class="api">[API] {{ api }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Suspicious Commands</h2>
+        <ul>
+            {% for cmd in report.commands %}
+                <li class="cmd">[CMD] {{ cmd }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Indicators of Compromise (IoCs)</h2>
+        <ul>
+            {% for ioc in report.iocs %}
+                <li class="ioc">[IOC] {{ ioc }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
